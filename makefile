@@ -175,7 +175,7 @@ OS_SUPPORT		= BARE_METAL
 USE_STM32PLUS = USE
 
 #STM32PLUS_DIR = ../stm32plus
-STM32PLUS_DIR = /home/fitsir/stm32_ws/src/stm32plus/lib
+STM32PLUS_DIR = ../stm32plus/lib
 ROSLIB_DIR = ./lib/ros_lib
 
 ifeq ($(USE_STM32PLUS),USE)
@@ -443,7 +443,8 @@ ifneq (,$(filter $(shell uname),Darwin Linux))
 #	@cp $(TARGET).elf $(OCDIR)
 #	@cd $(OCDIR) && ./$(OCD) $(OCD_CMD) -c "mt_flash $(TARGET).elf"
 #	$(OCD) $(OCD_CMD) -c "mt_flash_bin $(TARGET).bin 0x08000000"
-	$(OCD) $(OCD_CMD) -c init -c targets -c "halt" -c "flash write_image erase $(TARGET).bin 0x08000000" \
+	$(OCD) $(OCD_CMD) -c init -c targets -c "reset halt" \
+	-c "flash write_image erase $(TARGET).bin 0x08000000" \
 	-c "verify_image $(TARGET).bin" -c "reset run" -c shutdown
 else
 	$(OCD) $(OCD_CMD) -c "mt_flash $(TARGET).elf"
@@ -497,3 +498,4 @@ endif
 # Listing of phony targets.
 .PHONY : all begin finish end sizebefore sizeafter gccversion \
 build elf hex bin lss sym clean clean_list program
+
