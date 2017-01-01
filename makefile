@@ -36,7 +36,7 @@ DBG_ADAPTER  = STLINKV2
 # OpenOCD For FT2232 Devices Special Setting
 # If u use WinUSB as Device Driver,uncomment this!
 MPSSE	= ftdi
-#MPSSE	= 
+#MPSSE	=
 
 # Development Tools based on GNU Compiler Collection
 DEVTOOL = LAUNCHPAD
@@ -73,7 +73,7 @@ MAKEDIR = C:/Devz/Coreutils/bin
 
 # Set Flasher and Debugger
 ifneq (,$(filter $(shell uname),Darwin Linux))
-	OCDIR	= /usr/bin
+	OCDIR	= /usr/share/openocd
 else
 	OCDIR	= C:\openocd
 endif
@@ -92,8 +92,9 @@ else ifeq ($(DBG_ADAPTER),JTAGKEY2_SWD)
 OCD_ARG = -s $(OCDIR)/tcl						\
 		  -f interface/jtagkey2_swd.cfg 		\
 		  -f target/stm32f1x.cfg
-else
-OCD_ARG = -s $(OCDIR)/tcl						\
+else ifeq ($(DBG_ADAPTER),STLINKV2)
+OCD_ARG = -s $(OCDIR)/scripts						\
+          -f interface/stlink-v2.cfg		\
 		  -f target/stm32f1x.cfg
 endif
 else
@@ -101,6 +102,7 @@ OCD_ARG = -s $(OCDIR)/tcl						\
 		  -f interface/$(MPSSE)/jtagkey2.cfg 	\
           -f target/stm32f1x.cfg
 endif
+
 OCD_CMD = $(OCD_DBG) $(OCD_ARG)
 
 
@@ -135,13 +137,12 @@ APP_VER = W.I.P
 #USE_MPU = STM32F103CBT6
 USE_MPU = STM32F103ZET6
 
-
 ifeq ($(USE_MPU),STM32F103VET6)
  MPU_CLASS			= STM32F10x
  MPU_MODEL			= STM32F10X_HD
  SUBMODEL			= STM32F103VET6
  HSE_CLOCK 			= 12000000
- USE_EXT_SRAM   	= 
+ USE_EXT_SRAM   	=
  USE_TOUCH_SENCE 	=
  STM32PLUS_Fn = STM32PLUS_F1_HD
 
@@ -150,19 +151,18 @@ else ifeq ($(USE_MPU),STM32F103CBT6)
  MPU_MODEL			= STM32F10X_MD
  SUBMODEL			= STM32F103CBT6
  HSE_CLOCK 			= 12000000
- USE_EXT_SRAM   	= 
+ USE_EXT_SRAM   	=
  USE_TOUCH_SENCE 	=
  STM32PLUS_Fn = STM32PLUS_F1_MD
  #USE_DFU			= USE
 else ifeq ($(USE_MPU),STM32F103ZET6)
-  MPU_CLASS                     = STM32F10x
-  MPU_MODEL                     = STM32F10X_HD
-  SUBMODEL                      = STM32F103ZET6
-  HSE_CLOCK                     = 8000000
-  USE_EXT_SRAM          =
-  USE_TOUCH_SENCE       =
+  MPU_CLASS			= STM32F10x
+  MPU_MODEL			= STM32F10X_HD
+  SUBMODEL			= STM32F103ZET6
+  HSE_CLOCK 			= 8000000
+  USE_EXT_SRAM   	=
+  USE_TOUCH_SENCE 	=
   STM32PLUS_Fn = STM32PLUS_F1_HD
-
 else
  $(error TARGET MPU IS NOT DEFINED!!)
 endif
@@ -174,7 +174,8 @@ OS_SUPPORT		= BARE_METAL
 
 USE_STM32PLUS = USE
 
-STM32PLUS_DIR = ../stm32plus/lib
+#STM32PLUS_DIR = ../stm32plus
+STM32PLUS_DIR = /home/fitsir/stm32_ws/src/stm32plus/lib
 ROSLIB_DIR = ./lib/ros_lib
 
 ifeq ($(USE_STM32PLUS),USE)
@@ -188,10 +189,9 @@ ifeq ($(USE_STM32PLUS),USE)
    STATIC_LIB   	= -lstm32plus-small-f1md-$(HSE_CLOCK)
  endif
  ifeq ($(USE_MPU),STM32F103ZET6)
-   STM32PLUS_LIB_DIR = $(STM32PLUS_DIR)/build/small-f1hd-$(HSE_CLOCK)e
-   STATIC_LIB           = -lstm32plus-small-f1hd-$(HSE_CLOCK)e
+   STM32PLUS_LIB_DIR = $(STM32PLUS_DIR)/build/debug-f1hd-$(HSE_CLOCK)e
+   STATIC_LIB   	= -lstm32plus-debug-f1hd-$(HSE_CLOCK)e
  endif
-
 else
  FWLIB  			= ./lib/stm32plus/fwlib/f1/stdperiph
 endif
@@ -199,9 +199,9 @@ endif
 # Synthesis makefile Defines
 DEFZ = $(MPU_CLASS) $(SUBMODEL) $(EVAL_BOARD) $(PERIF_DRIVER) $(VECTOR_START) \
 	   $(USING_HOSTAGE) $(OS_SUPPORT) $(USE_EXT_SRAM) $(USE_EXT_SDRAM) $(USE_EXT_HEAP) $(UART_DEBUG) $(USE_BOARD)
-		
+
 DEFZ += $(STM32PLUS_Fn)
-		
+
 SYNTHESIS_DEFS	= $(addprefix -D,$(DEFZ)) 							\
 				 -DARM_MATH_CM3										\
 				 -DPACK_STRUCT_END=__attribute\(\(packed\)\) 		\
@@ -242,18 +242,18 @@ INCPATHS	 = 	./							\
 				$(STM32PLUS_DIR)/include	\
 				$(STM32PLUS_DIR)/include/stl\
 				$(ROSLIB_DIR)
-				
+
 INCLUDES     = $(addprefix -I ,$(INCPATHS))
 
 # Set library PATH
 LIBPATHS     = $(FWLIB) $(USBLIB) $(STM32PLUS_LIB_DIR)
 LIBRARY_DIRS = $(addprefix -L,$(LIBPATHS))
-# if you use math-library, put "-lm" 
+# if you use math-library, put "-lm"
 MATH_LIB	 =	-lm
 
 # LinkerScript PATH
 LINKER_PATH =  ./lib/linker
-LINKER_DIRS = $(addprefix -L,$(LINKER_PATH)) 
+LINKER_DIRS = $(addprefix -L,$(LINKER_PATH))
 
 # Object definition
 OBJS 	 = $(CFILES:%.c=$(OUTDIR)/%.o)  $(CPPFILES:%.cpp=$(OUTDIR)/%.o) $(SFILES:%.s=$(OUTDIR)/%.o)
@@ -316,13 +316,13 @@ C_CXXFLAGS += -fno-common
 C_CXXFLAGS += -Wall -Wno-array-bounds -Wno-unused-but-set-variable
 #C_CXXFLAGS += -Wdouble-promotion
 #C_CXXFLAGS += -Wredundant-decls -Wreturn-type -Wshadow -Wunused
-C_CXXFLAGS += -Wa,-adhlns=$(OUTDIR)/$(subst $(suffix $<),.lst,$<) 
+C_CXXFLAGS += -Wa,-adhlns=$(OUTDIR)/$(subst $(suffix $<),.lst,$<)
 C_CXXFLAGS += $(SYNTHESIS_DEFS)
 C_CXXFLAGS += -g3
 
 CFLAGS = -lstdc++ -std=gnu99
 
-CXXFLAGS = -std=gnu++11 -fpermissive -fsigned-char -fno-rtti -fexceptions -fmessage-length=0 
+CXXFLAGS = -std=gnu++11 -fpermissive -fsigned-char -fno-rtti -fexceptions -fmessage-length=0
 
 # Linker FLAGS
 LDFLAGS  = -mcpu=cortex-m3 -mthumb -mfix-cortex-m3-ldrd
@@ -347,12 +347,12 @@ DFLAGS = -w
 all: gccversion build buildinform sizeafter
 build: $(TARGET_ELF) $(TARGET_LSS) $(TARGET_SYM) $(TARGET_HEX) $(TARGET_SREC) $(TARGET_BIN)
 
-.SUFFIXES: .o .c .cpp .s   
+.SUFFIXES: .o .c .cpp .s
 
 $(TARGET_LSS): $(TARGET_ELF)
 	@$(MSGECHO)
 	@$(MSGECHO) Disassemble: $@
-	$(OBJDUMP) $(OBJDUMPFLAGS) $< > $@ 
+	$(OBJDUMP) $(OBJDUMPFLAGS) $< > $@
 $(TARGET_SYM): $(TARGET_ELF)
 	@$(MSGECHO)
 	@$(MSGECHO) Symbol: $@
@@ -360,15 +360,15 @@ $(TARGET_SYM): $(TARGET_ELF)
 $(TARGET).hex: $(TARGET).elf
 	@$(MSGECHO)
 	@$(MSGECHO) Objcopy: $@
-	$(OBJCOPY) $(OBJCPFLAGS) ihex $^ $@    
+	$(OBJCOPY) $(OBJCPFLAGS) ihex $^ $@
 $(TARGET).s19: $(TARGET).elf
 	@$(MSGECHO)
 	@$(MSGECHO) Objcopy: $@
-	$(OBJCOPY) $(OBJCPFLAGS) srec $^ $@ 
+	$(OBJCOPY) $(OBJCPFLAGS) srec $^ $@
 $(TARGET).bin: $(TARGET).elf
 	@$(MSGECHO)
 	@$(MSGECHO) Objcopy: $@
-	$(OBJCOPY) $(OBJCPFLAGS) binary $< $@ 
+	$(OBJCOPY) $(OBJCPFLAGS) binary $< $@
 $(TARGET).dfu: $(TARGET).hex
 	@$(MSGECHO)
 	@$(MSGECHO) Make STM32 dfu: $@
@@ -408,7 +408,7 @@ endif
 
 # Object Size Informations
 sizeafter: $(TARGET).elf $(TARGET).hex buildinform
-	@$(MSGECHO) 
+	@$(MSGECHO)
 	@$(MSGECHO) Built Object Informations:
 	@$(MSGECHO) === Total Binary Size ===
 	@$(SIZE) $(TARGET).hex
@@ -417,13 +417,13 @@ sizeafter: $(TARGET).elf $(TARGET).hex buildinform
 	@$(SIZE) -A -x $(TARGET).elf
 
 # Display compiler version information.
-gccversion : 
+gccversion :
 	@$(CC) --version
-	@$(MSGECHO) 
+	@$(MSGECHO)
 
 buildinform :
-	@$(MSGECHO) 
-	@$(MSGECHO) 
+	@$(MSGECHO)
+	@$(MSGECHO)
 	@$(MSGECHO) Built Informations:
 	@$(MSGECHO) TCHAIN_PATH = $(TCHAIN)
 	@$(MSGECHO) EVAL_BOARD = $(EVAL_BOARD)
@@ -442,7 +442,9 @@ program :
 ifneq (,$(filter $(shell uname),Darwin Linux))
 #	@cp $(TARGET).elf $(OCDIR)
 #	@cd $(OCDIR) && ./$(OCD) $(OCD_CMD) -c "mt_flash $(TARGET).elf"
-	@$(OCDIR)/$(OCD) $(OCD_CMD) -c "mt_flash_bin $(TARGET).bin 0x08000000"
+#	$(OCD) $(OCD_CMD) -c "mt_flash_bin $(TARGET).bin 0x08000000"
+	$(OCD) $(OCD_CMD) -c init -c targets -c "halt" -c "flash write_image erase $(TARGET).bin 0x08000000" \
+	-c "verify_image $(TARGET).bin" -c "reset run" -c shutdown
 else
 	$(OCD) $(OCD_CMD) -c "mt_flash $(TARGET).elf"
 #	$(OCD) $(OCD_CMD) -c "eraser"
@@ -495,4 +497,3 @@ endif
 # Listing of phony targets.
 .PHONY : all begin finish end sizebefore sizeafter gccversion \
 build elf hex bin lss sym clean clean_list program
-
