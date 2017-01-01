@@ -14,8 +14,16 @@ static const char GETSEARCHPOSITION[] = "hector_nav_msgs/GetSearchPosition";
   class GetSearchPositionRequest : public ros::Msg
   {
     public:
-      geometry_msgs::PoseStamped ooi_pose;
-      float distance;
+      typedef geometry_msgs::PoseStamped _ooi_pose_type;
+      _ooi_pose_type ooi_pose;
+      typedef float _distance_type;
+      _distance_type distance;
+
+    GetSearchPositionRequest():
+      ooi_pose(),
+      distance(0)
+    {
+    }
 
     virtual int serialize(unsigned char *outbuffer) const
     {
@@ -60,7 +68,13 @@ static const char GETSEARCHPOSITION[] = "hector_nav_msgs/GetSearchPosition";
   class GetSearchPositionResponse : public ros::Msg
   {
     public:
-      geometry_msgs::PoseStamped search_pose;
+      typedef geometry_msgs::PoseStamped _search_pose_type;
+      _search_pose_type search_pose;
+
+    GetSearchPositionResponse():
+      search_pose()
+    {
+    }
 
     virtual int serialize(unsigned char *outbuffer) const
     {

@@ -6,7 +6,11 @@ STM32 rosserial sample
 DEFAULT : USART1 / baud 57600bps / send buffer 1024byte / recieve buffer 1024byte
 If you want to change another USART, edit "./lib/ros_lib/STM32Hardware.h"
 
+
+
 ===!NOTICE!===
+2017-1-1 upgrade  ros_lib
+
 SpiralRay uses following INTELLECTUAL PROPERTIES under each licence.
 Those sourcecode are included in this project.
 

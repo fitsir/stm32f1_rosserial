@@ -15,33 +15,32 @@ static const char APPLYJOINTEFFORT[] = "gazebo_msgs/ApplyJointEffort";
   class ApplyJointEffortRequest : public ros::Msg
   {
     public:
-      const char* joint_name;
-      float effort;
-      ros::Time start_time;
-      ros::Duration duration;
+      typedef const char* _joint_name_type;
+      _joint_name_type joint_name;
+      typedef float _effort_type;
+      _effort_type effort;
+      typedef ros::Time _start_time_type;
+      _start_time_type start_time;
+      typedef ros::Duration _duration_type;
+      _duration_type duration;
+
+    ApplyJointEffortRequest():
+      joint_name(""),
+      effort(0),
+      start_time(),
+      duration()
+    {
+    }
 
     virtual int serialize(unsigned char *outbuffer) const
     {
       int offset = 0;
       uint32_t length_joint_name = strlen(this->joint_name);
-      memcpy(outbuffer + offset, &length_joint_name, sizeof(uint32_t));
+      varToArr(outbuffer + offset, length_joint_name);
       offset += 4;
       memcpy(outbuffer + offset, this->joint_name, length_joint_name);
       offset += length_joint_name;
-      int32_t * val_effort = (int32_t *) &(this->effort);
-      int32_t exp_effort = (((*val_effort)>>23)&255);
-      if(exp_effort != 0)
-        exp_effort += 1023-127;
-      int32_t sig_effort = *val_effort;
-      *(outbuffer + offset++) = 0;
-      *(outbuffer + offset++) = 0;
-      *(outbuffer + offset++) = 0;
-      *(outbuffer + offset++) = (sig_effort<<5) & 0xff;
-      *(outbuffer + offset++) = (sig_effort>>3) & 0xff;
-      *(outbuffer + offset++) = (sig_effort>>11) & 0xff;
-      *(outbuffer + offset++) = ((exp_effort<<4) & 0xF0) | ((sig_effort>>19)&0x0F);
-      *(outbuffer + offset++) = (exp_effort>>4) & 0x7F;
-      if(this->effort < 0) *(outbuffer + offset -1) |= 0x80;
+      offset += serializeAvrFloat64(outbuffer + offset, this->effort);
       *(outbuffer + offset + 0) = (this->start_time.sec >> (8 * 0)) & 0xFF;
       *(outbuffer + offset + 1) = (this->start_time.sec >> (8 * 1)) & 0xFF;
       *(outbuffer + offset + 2) = (this->start_time.sec >> (8 * 2)) & 0xFF;
@@ -69,7 +68,7 @@ static const char APPLYJOINTEFFORT[] = "gazebo_msgs/ApplyJointEffort";
     {
       int offset = 0;
       uint32_t length_joint_name;
-      memcpy(&length_joint_name, (inbuffer + offset), sizeof(uint32_t));
+      arrToVar(length_joint_name, (inbuffer + offset));
       offset += 4;
       for(unsigned int k= offset; k< offset+length_joint_name; ++k){
           inbuffer[k-1]=inbuffer[k];
@@ -77,17 +76,7 @@ static const char APPLYJOINTEFFORT[] = "gazebo_msgs/ApplyJointEffort";
       inbuffer[offset+length_joint_name-1]=0;
       this->joint_name = (char *)(inbuffer + offset-1);
       offset += length_joint_name;
-      uint32_t * val_effort = (uint32_t*) &(this->effort);
-      offset += 3;
-      *val_effort = ((uint32_t)(*(inbuffer + offset++))>>5 & 0x07);
-      *val_effort |= ((uint32_t)(*(inbuffer + offset++)) & 0xff)<<3;
-      *val_effort |= ((uint32_t)(*(inbuffer + offset++)) & 0xff)<<11;
-      *val_effort |= ((uint32_t)(*(inbuffer + offset)) & 0x0f)<<19;
-      uint32_t exp_effort = ((uint32_t)(*(inbuffer + offset++))&0xf0)>>4;
-      exp_effort |= ((uint32_t)(*(inbuffer + offset)) & 0x7f)<<4;
-      if(exp_effort !=0)
-        *val_effort |= ((exp_effort)-1023+127)<<23;
-      if( ((*(inbuffer+offset++)) & 0x80) > 0) this->effort = -this->effort;
+      offset += deserializeAvrFloat64(inbuffer + offset, &(this->effort));
       this->start_time.sec =  ((uint32_t) (*(inbuffer + offset)));
       this->start_time.sec |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1);
       this->start_time.sec |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);
@@ -119,8 +108,16 @@ static const char APPLYJOINTEFFORT[] = "gazebo_msgs/ApplyJointEffort";
   class ApplyJointEffortResponse : public ros::Msg
   {
     public:
-      bool success;
-      const char* status_message;
+      typedef bool _success_type;
+      _success_type success;
+      typedef const char* _status_message_type;
+      _status_message_type status_message;
+
+    ApplyJointEffortResponse():
+      success(0),
+      status_message("")
+    {
+    }
 
     virtual int serialize(unsigned char *outbuffer) const
     {
@@ -133,7 +130,7 @@ static const char APPLYJOINTEFFORT[] = "gazebo_msgs/ApplyJointEffort";
       *(outbuffer + offset + 0) = (u_success.base >> (8 * 0)) & 0xFF;
       offset += sizeof(this->success);
       uint32_t length_status_message = strlen(this->status_message);
-      memcpy(outbuffer + offset, &length_status_message, sizeof(uint32_t));
+      varToArr(outbuffer + offset, length_status_message);
       offset += 4;
       memcpy(outbuffer + offset, this->status_message, length_status_message);
       offset += length_status_message;
@@ -152,7 +149,7 @@ static const char APPLYJOINTEFFORT[] = "gazebo_msgs/ApplyJointEffort";
       this->success = u_success.real;
       offset += sizeof(this->success);
       uint32_t length_status_message;
-      memcpy(&length_status_message, (inbuffer + offset), sizeof(uint32_t));
+      arrToVar(length_status_message, (inbuffer + offset));
       offset += 4;
       for(unsigned int k= offset; k< offset+length_status_message; ++k){
           inbuffer[k-1]=inbuffer[k];

@@ -15,6 +15,10 @@ static const char GETROBOTTRAJECTORY[] = "hector_nav_msgs/GetRobotTrajectory";
   {
     public:
 
+    GetRobotTrajectoryRequest()
+    {
+    }
+
     virtual int serialize(unsigned char *outbuffer) const
     {
       int offset = 0;
@@ -35,7 +39,13 @@ static const char GETROBOTTRAJECTORY[] = "hector_nav_msgs/GetRobotTrajectory";
   class GetRobotTrajectoryResponse : public ros::Msg
   {
     public:
-      nav_msgs::Path trajectory;
+      typedef nav_msgs::Path _trajectory_type;
+      _trajectory_type trajectory;
+
+    GetRobotTrajectoryResponse():
+      trajectory()
+    {
+    }
 
     virtual int serialize(unsigned char *outbuffer) const
     {

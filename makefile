@@ -15,7 +15,7 @@ endif
 
 # Toolchain prefix (i.e arm-none-eabi -> arm-none-eabi-gcc.exe)
 ifneq (,$(filter $(shell uname),Darwin Linux))
-TCHAIN  = /usr/local/arm-cs-tools/bin/arm-none-eabi
+TCHAIN  = /usr/bin/arm-none-eabi
 else
 # Toolchain prefix (i.e arm-none-eabi -> arm-none-eabi-gcc.exe)
 TCHAIN  = "$(GNU_ARM_PATH)/bin/arm-none-eabi"
@@ -73,7 +73,7 @@ MAKEDIR = C:/Devz/Coreutils/bin
 
 # Set Flasher and Debugger
 ifneq (,$(filter $(shell uname),Darwin Linux))
-	OCDIR	= /usr/local/openocd
+	OCDIR	= /usr/bin
 else
 	OCDIR	= C:\openocd
 endif
@@ -132,7 +132,9 @@ ALIGNED_ACCESS	= -mno-unaligned-access
 APP_VER = W.I.P
 
 #USE_MPU = STM32F103VET6
-USE_MPU = STM32F103CBT6
+#USE_MPU = STM32F103CBT6
+USE_MPU = STM32F103ZET6
+
 
 ifeq ($(USE_MPU),STM32F103VET6)
  MPU_CLASS			= STM32F10x
@@ -152,6 +154,15 @@ else ifeq ($(USE_MPU),STM32F103CBT6)
  USE_TOUCH_SENCE 	=
  STM32PLUS_Fn = STM32PLUS_F1_MD
  #USE_DFU			= USE
+else ifeq ($(USE_MPU),STM32F103ZET6)
+  MPU_CLASS                     = STM32F10x
+  MPU_MODEL                     = STM32F10X_HD
+  SUBMODEL                      = STM32F103ZET6
+  HSE_CLOCK                     = 8000000
+  USE_EXT_SRAM          =
+  USE_TOUCH_SENCE       =
+  STM32PLUS_Fn = STM32PLUS_F1_HD
+
 else
  $(error TARGET MPU IS NOT DEFINED!!)
 endif
@@ -163,7 +174,7 @@ OS_SUPPORT		= BARE_METAL
 
 USE_STM32PLUS = USE
 
-STM32PLUS_DIR = ../stm32plus
+STM32PLUS_DIR = ../stm32plus/lib
 ROSLIB_DIR = ./lib/ros_lib
 
 ifeq ($(USE_STM32PLUS),USE)
@@ -176,6 +187,11 @@ ifeq ($(USE_STM32PLUS),USE)
    STM32PLUS_LIB_DIR = $(STM32PLUS_DIR)/build/small-f1md-$(HSE_CLOCK)
    STATIC_LIB   	= -lstm32plus-small-f1md-$(HSE_CLOCK)
  endif
+ ifeq ($(USE_MPU),STM32F103ZET6)
+   STM32PLUS_LIB_DIR = $(STM32PLUS_DIR)/build/small-f1hd-$(HSE_CLOCK)e
+   STATIC_LIB           = -lstm32plus-small-f1hd-$(HSE_CLOCK)e
+ endif
+
 else
  FWLIB  			= ./lib/stm32plus/fwlib/f1/stdperiph
 endif

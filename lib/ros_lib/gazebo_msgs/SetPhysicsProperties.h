@@ -15,42 +15,28 @@ static const char SETPHYSICSPROPERTIES[] = "gazebo_msgs/SetPhysicsProperties";
   class SetPhysicsPropertiesRequest : public ros::Msg
   {
     public:
-      float time_step;
-      float max_update_rate;
-      geometry_msgs::Vector3 gravity;
-      gazebo_msgs::ODEPhysics ode_config;
+      typedef float _time_step_type;
+      _time_step_type time_step;
+      typedef float _max_update_rate_type;
+      _max_update_rate_type max_update_rate;
+      typedef geometry_msgs::Vector3 _gravity_type;
+      _gravity_type gravity;
+      typedef gazebo_msgs::ODEPhysics _ode_config_type;
+      _ode_config_type ode_config;
+
+    SetPhysicsPropertiesRequest():
+      time_step(0),
+      max_update_rate(0),
+      gravity(),
+      ode_config()
+    {
+    }
 
     virtual int serialize(unsigned char *outbuffer) const
     {
       int offset = 0;
-      int32_t * val_time_step = (int32_t *) &(this->time_step);
-      int32_t exp_time_step = (((*val_time_step)>>23)&255);
-      if(exp_time_step != 0)
-        exp_time_step += 1023-127;
-      int32_t sig_time_step = *val_time_step;
-      *(outbuffer + offset++) = 0;
-      *(outbuffer + offset++) = 0;
-      *(outbuffer + offset++) = 0;
-      *(outbuffer + offset++) = (sig_time_step<<5) & 0xff;
-      *(outbuffer + offset++) = (sig_time_step>>3) & 0xff;
-      *(outbuffer + offset++) = (sig_time_step>>11) & 0xff;
-      *(outbuffer + offset++) = ((exp_time_step<<4) & 0xF0) | ((sig_time_step>>19)&0x0F);
-      *(outbuffer + offset++) = (exp_time_step>>4) & 0x7F;
-      if(this->time_step < 0) *(outbuffer + offset -1) |= 0x80;
-      int32_t * val_max_update_rate = (int32_t *) &(this->max_update_rate);
-      int32_t exp_max_update_rate = (((*val_max_update_rate)>>23)&255);
-      if(exp_max_update_rate != 0)
-        exp_max_update_rate += 1023-127;
-      int32_t sig_max_update_rate = *val_max_update_rate;
-      *(outbuffer + offset++) = 0;
-      *(outbuffer + offset++) = 0;
-      *(outbuffer + offset++) = 0;
-      *(outbuffer + offset++) = (sig_max_update_rate<<5) & 0xff;
-      *(outbuffer + offset++) = (sig_max_update_rate>>3) & 0xff;
-      *(outbuffer + offset++) = (sig_max_update_rate>>11) & 0xff;
-      *(outbuffer + offset++) = ((exp_max_update_rate<<4) & 0xF0) | ((sig_max_update_rate>>19)&0x0F);
-      *(outbuffer + offset++) = (exp_max_update_rate>>4) & 0x7F;
-      if(this->max_update_rate < 0) *(outbuffer + offset -1) |= 0x80;
+      offset += serializeAvrFloat64(outbuffer + offset, this->time_step);
+      offset += serializeAvrFloat64(outbuffer + offset, this->max_update_rate);
       offset += this->gravity.serialize(outbuffer + offset);
       offset += this->ode_config.serialize(outbuffer + offset);
       return offset;
@@ -59,28 +45,8 @@ static const char SETPHYSICSPROPERTIES[] = "gazebo_msgs/SetPhysicsProperties";
     virtual int deserialize(unsigned char *inbuffer)
     {
       int offset = 0;
-      uint32_t * val_time_step = (uint32_t*) &(this->time_step);
-      offset += 3;
-      *val_time_step = ((uint32_t)(*(inbuffer + offset++))>>5 & 0x07);
-      *val_time_step |= ((uint32_t)(*(inbuffer + offset++)) & 0xff)<<3;
-      *val_time_step |= ((uint32_t)(*(inbuffer + offset++)) & 0xff)<<11;
-      *val_time_step |= ((uint32_t)(*(inbuffer + offset)) & 0x0f)<<19;
-      uint32_t exp_time_step = ((uint32_t)(*(inbuffer + offset++))&0xf0)>>4;
-      exp_time_step |= ((uint32_t)(*(inbuffer + offset)) & 0x7f)<<4;
-      if(exp_time_step !=0)
-        *val_time_step |= ((exp_time_step)-1023+127)<<23;
-      if( ((*(inbuffer+offset++)) & 0x80) > 0) this->time_step = -this->time_step;
-      uint32_t * val_max_update_rate = (uint32_t*) &(this->max_update_rate);
-      offset += 3;
-      *val_max_update_rate = ((uint32_t)(*(inbuffer + offset++))>>5 & 0x07);
-      *val_max_update_rate |= ((uint32_t)(*(inbuffer + offset++)) & 0xff)<<3;
-      *val_max_update_rate |= ((uint32_t)(*(inbuffer + offset++)) & 0xff)<<11;
-      *val_max_update_rate |= ((uint32_t)(*(inbuffer + offset)) & 0x0f)<<19;
-      uint32_t exp_max_update_rate = ((uint32_t)(*(inbuffer + offset++))&0xf0)>>4;
-      exp_max_update_rate |= ((uint32_t)(*(inbuffer + offset)) & 0x7f)<<4;
-      if(exp_max_update_rate !=0)
-        *val_max_update_rate |= ((exp_max_update_rate)-1023+127)<<23;
-      if( ((*(inbuffer+offset++)) & 0x80) > 0) this->max_update_rate = -this->max_update_rate;
+      offset += deserializeAvrFloat64(inbuffer + offset, &(this->time_step));
+      offset += deserializeAvrFloat64(inbuffer + offset, &(this->max_update_rate));
       offset += this->gravity.deserialize(inbuffer + offset);
       offset += this->ode_config.deserialize(inbuffer + offset);
      return offset;
@@ -94,8 +60,16 @@ static const char SETPHYSICSPROPERTIES[] = "gazebo_msgs/SetPhysicsProperties";
   class SetPhysicsPropertiesResponse : public ros::Msg
   {
     public:
-      bool success;
-      const char* status_message;
+      typedef bool _success_type;
+      _success_type success;
+      typedef const char* _status_message_type;
+      _status_message_type status_message;
+
+    SetPhysicsPropertiesResponse():
+      success(0),
+      status_message("")
+    {
+    }
 
     virtual int serialize(unsigned char *outbuffer) const
     {
@@ -108,7 +82,7 @@ static const char SETPHYSICSPROPERTIES[] = "gazebo_msgs/SetPhysicsProperties";
       *(outbuffer + offset + 0) = (u_success.base >> (8 * 0)) & 0xFF;
       offset += sizeof(this->success);
       uint32_t length_status_message = strlen(this->status_message);
-      memcpy(outbuffer + offset, &length_status_message, sizeof(uint32_t));
+      varToArr(outbuffer + offset, length_status_message);
       offset += 4;
       memcpy(outbuffer + offset, this->status_message, length_status_message);
       offset += length_status_message;
@@ -127,7 +101,7 @@ static const char SETPHYSICSPROPERTIES[] = "gazebo_msgs/SetPhysicsProperties";
       this->success = u_success.real;
       offset += sizeof(this->success);
       uint32_t length_status_message;
-      memcpy(&length_status_message, (inbuffer + offset), sizeof(uint32_t));
+      arrToVar(length_status_message, (inbuffer + offset));
       offset += 4;
       for(unsigned int k= offset; k< offset+length_status_message; ++k){
           inbuffer[k-1]=inbuffer[k];

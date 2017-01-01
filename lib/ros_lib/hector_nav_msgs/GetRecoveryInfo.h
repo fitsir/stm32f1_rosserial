@@ -16,8 +16,16 @@ static const char GETRECOVERYINFO[] = "hector_nav_msgs/GetRecoveryInfo";
   class GetRecoveryInfoRequest : public ros::Msg
   {
     public:
-      ros::Time request_time;
-      float request_radius;
+      typedef ros::Time _request_time_type;
+      _request_time_type request_time;
+      typedef float _request_radius_type;
+      _request_radius_type request_radius;
+
+    GetRecoveryInfoRequest():
+      request_time(),
+      request_radius(0)
+    {
+    }
 
     virtual int serialize(unsigned char *outbuffer) const
     {
@@ -32,20 +40,7 @@ static const char GETRECOVERYINFO[] = "hector_nav_msgs/GetRecoveryInfo";
       *(outbuffer + offset + 2) = (this->request_time.nsec >> (8 * 2)) & 0xFF;
       *(outbuffer + offset + 3) = (this->request_time.nsec >> (8 * 3)) & 0xFF;
       offset += sizeof(this->request_time.nsec);
-      int32_t * val_request_radius = (int32_t *) &(this->request_radius);
-      int32_t exp_request_radius = (((*val_request_radius)>>23)&255);
-      if(exp_request_radius != 0)
-        exp_request_radius += 1023-127;
-      int32_t sig_request_radius = *val_request_radius;
-      *(outbuffer + offset++) = 0;
-      *(outbuffer + offset++) = 0;
-      *(outbuffer + offset++) = 0;
-      *(outbuffer + offset++) = (sig_request_radius<<5) & 0xff;
-      *(outbuffer + offset++) = (sig_request_radius>>3) & 0xff;
-      *(outbuffer + offset++) = (sig_request_radius>>11) & 0xff;
-      *(outbuffer + offset++) = ((exp_request_radius<<4) & 0xF0) | ((sig_request_radius>>19)&0x0F);
-      *(outbuffer + offset++) = (exp_request_radius>>4) & 0x7F;
-      if(this->request_radius < 0) *(outbuffer + offset -1) |= 0x80;
+      offset += serializeAvrFloat64(outbuffer + offset, this->request_radius);
       return offset;
     }
 
@@ -62,17 +57,7 @@ static const char GETRECOVERYINFO[] = "hector_nav_msgs/GetRecoveryInfo";
       this->request_time.nsec |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);
       this->request_time.nsec |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3);
       offset += sizeof(this->request_time.nsec);
-      uint32_t * val_request_radius = (uint32_t*) &(this->request_radius);
-      offset += 3;
-      *val_request_radius = ((uint32_t)(*(inbuffer + offset++))>>5 & 0x07);
-      *val_request_radius |= ((uint32_t)(*(inbuffer + offset++)) & 0xff)<<3;
-      *val_request_radius |= ((uint32_t)(*(inbuffer + offset++)) & 0xff)<<11;
-      *val_request_radius |= ((uint32_t)(*(inbuffer + offset)) & 0x0f)<<19;
-      uint32_t exp_request_radius = ((uint32_t)(*(inbuffer + offset++))&0xf0)>>4;
-      exp_request_radius |= ((uint32_t)(*(inbuffer + offset)) & 0x7f)<<4;
-      if(exp_request_radius !=0)
-        *val_request_radius |= ((exp_request_radius)-1023+127)<<23;
-      if( ((*(inbuffer+offset++)) & 0x80) > 0) this->request_radius = -this->request_radius;
+      offset += deserializeAvrFloat64(inbuffer + offset, &(this->request_radius));
      return offset;
     }
 
@@ -84,9 +69,19 @@ static const char GETRECOVERYINFO[] = "hector_nav_msgs/GetRecoveryInfo";
   class GetRecoveryInfoResponse : public ros::Msg
   {
     public:
-      nav_msgs::Path trajectory_radius_entry_pose_to_req_pose;
-      geometry_msgs::PoseStamped radius_entry_pose;
-      geometry_msgs::PoseStamped req_pose;
+      typedef nav_msgs::Path _trajectory_radius_entry_pose_to_req_pose_type;
+      _trajectory_radius_entry_pose_to_req_pose_type trajectory_radius_entry_pose_to_req_pose;
+      typedef geometry_msgs::PoseStamped _radius_entry_pose_type;
+      _radius_entry_pose_type radius_entry_pose;
+      typedef geometry_msgs::PoseStamped _req_pose_type;
+      _req_pose_type req_pose;
+
+    GetRecoveryInfoResponse():
+      trajectory_radius_entry_pose_to_req_pose(),
+      radius_entry_pose(),
+      req_pose()
+    {
+    }
 
     virtual int serialize(unsigned char *outbuffer) const
     {

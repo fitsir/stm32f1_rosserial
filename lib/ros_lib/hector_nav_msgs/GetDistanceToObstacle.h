@@ -14,7 +14,13 @@ static const char GETDISTANCETOOBSTACLE[] = "hector_nav_msgs/GetDistanceToObstac
   class GetDistanceToObstacleRequest : public ros::Msg
   {
     public:
-      geometry_msgs::PointStamped point;
+      typedef geometry_msgs::PointStamped _point_type;
+      _point_type point;
+
+    GetDistanceToObstacleRequest():
+      point()
+    {
+    }
 
     virtual int serialize(unsigned char *outbuffer) const
     {
@@ -38,8 +44,16 @@ static const char GETDISTANCETOOBSTACLE[] = "hector_nav_msgs/GetDistanceToObstac
   class GetDistanceToObstacleResponse : public ros::Msg
   {
     public:
-      float distance;
-      geometry_msgs::PointStamped end_point;
+      typedef float _distance_type;
+      _distance_type distance;
+      typedef geometry_msgs::PointStamped _end_point_type;
+      _end_point_type end_point;
+
+    GetDistanceToObstacleResponse():
+      distance(0),
+      end_point()
+    {
+    }
 
     virtual int serialize(unsigned char *outbuffer) const
     {
